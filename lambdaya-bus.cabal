@@ -11,15 +11,15 @@ name:                lambdaya-bus
 --                   | | +----- non-breaking API additions
 --                   | | | +--- code changes with no API change
 --                   | | | | +- doc update
-version:             0.0.0.1
+version:             0.0.0.2
 
 -- A short (one-line) description of the package.
 synopsis: Fpga bus core and serialization for RedPitaya         
 
 -- A longer description of the package.
-description: Bus library for RedPitaya that enables data serialization 
+description: Fpga bus core for RedPitaya that enables data serialization 
              between Fpga core and client running either on arm or remotely over network.
-             Type signature of Fpga core is used to define interface signature for client.
+             Type signature of Fpga core is used to define interface for client.
 
 -- The license under which the package is released.
 license:             LGPL-3
@@ -51,7 +51,7 @@ cabal-version:       >=1.10
 
 source-repository head
   type:     git
-  location: https://github.com/ra1u/Lambdaya.git
+  location: https://github.com/ra1u/lambdaya-bus
 
 
 library
