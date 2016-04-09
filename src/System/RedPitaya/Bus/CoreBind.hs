@@ -30,18 +30,12 @@ import Language.Haskell.TH
 import qualified Prelude
 
 -- | constraint for defining type being `BitPack` 
-type BuildThC a b = ( KnownNat b
-                  , KnownNat (BitSize a)
-                  , BitPack a
-                  , (BitSize a) ~ b )
+type BuildThC a b = ( KnownNat b, KnownNat (BitSize a), BitPack a, (BitSize a) ~ b )
 
 --  | constraint for  a = (b * 32) + c and c <= 32
-type BuildThModC a b c d = ( KnownNat a
-                  , KnownNat b
-                  , KnownNat c
-                  , KnownNat (b * 32)
-                  , ((b * 32) + c) ~ a
-                  , (c + d) ~ 32)
+type BuildThModC a b c d = ( KnownNat a, KnownNat b, KnownNat c, KnownNat (b * 32)
+                  , ((b * 32) + c) ~ a, (c + d) ~ 32)
+
 -- | constraint `BuildThModC` and `BuildThC`
 type BusBuildC a a1 a2 a3 a4 = ( BuildThC a a1 , BuildThModC a1 a2 a3 a4 )
 
@@ -139,6 +133,7 @@ coreBusWriteSingle same d
      | same = Just $ unpack (d ++# def)
      | otherwise = Nothing 
 
+-- write for Bitsize >= 33
 coreBusWriteSimple :: forall ad a0 a c c' . 
                      (Num ad, Eq ad, BuildThModC a0 a c c',KnownNat c')
                   => (SNat a,SNat c)
@@ -180,8 +175,8 @@ busBuild :: forall adr a a1 a2 a3 a4 b b1 b2 b3 b4.
                                  , KnownNat b4) 
            => (SNat a2 , SNat a3, SNat b2, SNat b3) 
            -> ( Signal a -> Signal  b ) 
-           -> Signal BusRwIn
-           -> Signal (Maybe FullDataOut)
+           -> Signal BusIn
+           -> Signal BusOut
 busBuild types core busInput = sigOut
   where   
     (sinA,sinC,soutA,soutC) = types 

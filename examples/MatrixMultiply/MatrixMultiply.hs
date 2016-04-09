@@ -1,20 +1,11 @@
-{-|
-Copyright  :  Luka Rahne
-License    :  LGPL-3 (see the file LICENSE)
-Maintainer :  Luka Rahne <luka.rahne@gmail.com>
--}
-
 {-# LANGUAGE DataKinds             #-}
 {-# LANGUAGE TypeOperators         #-}
 {-# LANGUAGE DataKinds             #-}
 {-# LANGUAGE TypeOperators         #-}
 {-# LANGUAGE FlexibleContexts      #-}
 
-module System.RedPitaya.Bus.MatrixMultiply 
-(
-  Matrix(..),
-  matrixMultiply
-)
+module MatrixMultiply 
+
 where
 import CLaSH.Prelude as CP
 import qualified Prelude

@@ -17,8 +17,8 @@ module System.RedPitaya.Bus.RedPitayaSimple
     RpBusSysIn(..),
     RpBusSysOut(..),
     ReadWrite(..),
-    BusRwIn,
-    BusWOut,
+    BusIn,
+    BusOut,
     defTopRedPitayaSimple,
     rpSimpleBind,
     addrLow
@@ -59,13 +59,13 @@ data RpBusSysOut = RpBusSysOut {
 
 data ReadWrite = Read | Write
 
-type BusRwIn =  Maybe (FullAddress,ReadWrite,FullDataIn)
-type BusWOut = Maybe FullDataOut
+type BusIn =  Maybe (FullAddress,ReadWrite,FullDataIn)
+type BusOut = Maybe FullDataOut
  
 
 -- | provide redPitayaSimple interface ovet simplified bus 
 -- where redPitayaSimple is bus as defined <https://github.com/ra1u/RedPitaya/blob/clash/fpga/rtl/red_pitaya_top.v>
-rpSimpleBind :: (Signal BusRwIn -> Signal BusWOut) 
+rpSimpleBind :: (Signal BusIn -> Signal BusOut) 
                 -> Signal RpBusSysIn 
                 -> Signal RpBusSysOut
 rpSimpleBind f sig = postProc <$> bundle (fin,fout)
@@ -74,7 +74,7 @@ rpSimpleBind f sig = postProc <$> bundle (fin,fout)
      fout = f fin
      preProc din
         | we == re = Nothing
-        | otherwise  =  Just  (truncateB (addrRpBus din),getRw ,dataInRpBus din) :: BusRwIn
+        | otherwise  =  Just  (truncateB (addrRpBus din),getRw ,dataInRpBus din) :: BusIn
              where
                we = writeEnableRpBus din
                re = readEnableRpBus din
@@ -86,7 +86,7 @@ rpSimpleBind f sig = postProc <$> bundle (fin,fout)
 
 
 -- | remove away MSB part of address with page info away 
-addrLow :: Signal BusRwIn -> Signal BusRwIn
+addrLow :: Signal BusIn -> Signal BusIn
 addrLow sig =  fmap ( fmap f )  sig where
     f (addr,m,din) = (addr .&.0xFFFFF,m,din) 
 
