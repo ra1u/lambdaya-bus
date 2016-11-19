@@ -5,7 +5,8 @@ Maintainer :  Luka Rahne <luka.rahne@gmail.com>
 -}
 
 {-# LANGUAGE DataKinds             #-}
-
+{-# LANGUAGE TemplateHaskell       #-}
+{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
 
 module System.RedPitaya.Bus.RedPitayaSimple
 (
@@ -21,14 +22,17 @@ module System.RedPitaya.Bus.RedPitayaSimple
     BusOut,
     defTopRedPitayaSimple,
     rpSimpleBind,
-    addrLow
+    addrLow,
+    mapAddr
 )
 where
 import CLaSH.Prelude
-import qualified Prelude as P
+import GHC.Generics (Generic)
+import Control.DeepSeq
 
 -- | this definition should be used to define bus that can be directly build
 -- with fpga core defined in redpitaya branch clash https://github.com/ra1u/RedPitaya/tree/clash
+defTopRedPitayaSimple :: TopEntity
 defTopRedPitayaSimple = (defTop
     { t_name     = "red_pitaya_clash_bus"
     , t_inputs   = ["add_i","data_i","strobe_i","we_i","re_i"]
@@ -57,11 +61,11 @@ data RpBusSysOut = RpBusSysOut {
     err :: Bool
 } deriving(Show)
 
-data ReadWrite = Read | Write
+data ReadWrite = Read | Write deriving (Show,Generic, NFData) 
 
 type BusIn =  Maybe (FullAddress,ReadWrite,FullDataIn)
 type BusOut = Maybe FullDataOut
- 
+
 
 -- | provide redPitayaSimple interface ovet simplified bus 
 -- where redPitayaSimple is bus as defined <https://github.com/ra1u/RedPitaya/blob/clash/fpga/rtl/red_pitaya_top.v>
@@ -81,14 +85,18 @@ rpSimpleBind f sig = postProc <$> bundle (fin,fout)
                getRw 
                    | we = Write
                    | otherwise = Read
-     postProc (Just inp,Just out) = RpBusSysOut out True False
+     postProc (Just _ ,Just out) = RpBusSysOut out True False
      postProc _ = RpBusSysOut 0 False False
 
 
+{-# INLINE mapAddr #-}
+mapAddr :: (a->b) -> Maybe (a,ReadWrite,FullDataIn) -> Maybe (b,ReadWrite,FullDataIn)
+mapAddr = fmap . fst' where fst' f (a,b,c) = (f a,b,c)
+ 
+
+{-# INLINE addrLow #-}
 -- | remove away MSB part of address with page info away 
 addrLow :: Signal BusIn -> Signal BusIn
-addrLow sig =  fmap ( fmap f )  sig where
-    f (addr,m,din) = (addr .&.0xFFFFF,m,din) 
-
+addrLow =  fmap (mapAddr (.&.0xFFFFF))
 
 

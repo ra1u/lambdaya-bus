@@ -11,7 +11,7 @@ name:                lambdaya-bus
 --                   | | +----- non-breaking API additions
 --                   | | | +--- code changes with no API change
 --                   | | | | +- doc update
-version:             0.0.0.2
+version:             0.1.0.0
 
 -- A short (one-line) description of the package.
 synopsis: Fpga bus core and serialization for RedPitaya         
@@ -60,7 +60,8 @@ library
                    System.RedPitaya.Bus.CoreBind
                    System.RedPitaya.Bus.ClientBind,
                    System.RedPitaya.Bus.RedPitayaSimple
-  
+                   System.RedPitaya.Bus.Tools
+
   -- Modules included in this library but not exported.
   -- other-modules:  
   
@@ -70,10 +71,11 @@ library
   -- Other library packages from which modules are imported.
   build-depends:    
     base >= 3 && < 5, 
-    clash-prelude >=  0.10,
+    clash-prelude ,
     Lambdaya >= 0.3 && < 1.0,
-    template-haskell >= 2.10
-  
+    template-haskell >= 2.10,
+    deepseq
+
   -- Directories containing source files.
   hs-source-dirs:      src
   
